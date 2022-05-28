@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { PrismaClient } from '@prisma/client';
-import { courses } from './courses';
+import { courses } from '../courses';
 
 export async function getStaticProps({ params }) {
   const prisma = new PrismaClient();

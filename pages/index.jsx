@@ -1,4 +1,4 @@
-import { getModeColor } from './utils';
+import { getModeColor } from '../utils';
 
 const modes = [
   {
