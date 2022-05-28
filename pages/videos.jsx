@@ -4,8 +4,6 @@ import { courses } from '../courses';
 
 export async function getStaticProps({ params }) {
   const prisma = new PrismaClient();
-  // debugger;
-  console.log('prisma', prisma);
   const modeNameToModeId = {
     nonzzmt: 0,
     zzmt: 1,
