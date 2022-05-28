@@ -1,4 +1,5 @@
 import { getModeColor } from '../utils';
+import Link from 'next/link';
 
 const modes = [
   {
@@ -34,15 +35,23 @@ export default () => (
         {modes.map((mode) => {
           const modeColor = getModeColor(mode.id);
           return (
-            <a
-              key={mode.id}
-              href={`/picktrack.html?mode=${mode.id}`}
-              className={`flex h-16 w-32 justify-center p-1 grayscale transition hover:grayscale-0 focus:grayscale-0`}
-            >
-              <h3 style={{ color: modeColor }}>{mode.title}</h3>
-              <span>{mode.desc}</span>
-              {mode.desc2 ? <span>{mode.desc2}</span> : null}
-            </a>
+            <>
+              <Link
+                key={mode.id}
+                href={{
+                  pathname: '/picktrack',
+                  query: { mode: mode.id }
+                }}
+              >
+                <a
+                  className={`flex h-16 w-32 justify-center p-1 grayscale transition hover:grayscale-0 focus:grayscale-0`}
+                >
+                  <h3 style={{ color: modeColor }}>{mode.title}</h3>
+                  <span>{mode.desc}</span>
+                  {mode.desc2 ? <span>{mode.desc2}</span> : null}
+                </a>
+              </Link>
+            </>
           );
         })}
       </div>

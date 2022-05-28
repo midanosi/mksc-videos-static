@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const tracks = [
   {
@@ -19,19 +20,24 @@ export default function PickTrack() {
         <div className="grid grid-cols-5 mt-6 gap-y-2">
           {tracks.map((track) => {
             return (
-              <a
-                key={track.cid}
-                href={`/videos.html?cid=${track.cid}&mode=${mode}`}
-                className={`relative`}
-              >
-                <h3 className="absolute transform -translate-x-1/2 -translate-y-1/2 bg-black-700 top-2 left-1/2 bg-opacity-20">
-                  {track.title}
-                </h3>
-                <img
-                  src={`/${track.cid}.png`}
-                  alt={`thumbnail for ${track.title}`}
-                />
-              </a>
+              <>
+                <Link
+                  key={track.cid}
+                  href={{
+                    pathname: `/videos/${track.cid}/${mode}`
+                  }}
+                >
+                  <a className={`relative`}>
+                    <h3 className="absolute transform -translate-x-1/2 -translate-y-1/2 bg-black-700 top-2 left-1/2 bg-opacity-20">
+                      {track.title}
+                    </h3>
+                    <img
+                      src={`/${track.cid}.png`}
+                      alt={`thumbnail for ${track.title}`}
+                    />
+                  </a>
+                </Link>
+              </>
             );
           })}
         </div>

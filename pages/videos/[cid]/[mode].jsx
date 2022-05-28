@@ -1,6 +1,37 @@
 import { useRouter } from 'next/router';
 import { PrismaClient } from '@prisma/client';
-import { courses } from '../courses';
+import { courses } from '../../../courses';
+
+function chunkArray(a, chunk) {
+  if (a.length <= chunk) return [a];
+  let arr = [];
+  a.forEach((_, i) => {
+    if (i % chunk === 0) arr.push(a.slice(i, i + chunk));
+  });
+  const [left_overs] = arr.filter((a) => a.length < chunk);
+  arr = arr.filter((a) => a.length >= chunk);
+  arr[arr.length - 1] = [...arr[arr.length - 1], ...left_overs];
+  return arr;
+}
+
+export async function getStaticPaths() {
+  const cids = [...Array(80).keys()];
+  const modes = ['nonzzmt', 'zzmt', 'sc', 'nolapskips'];
+
+  let paths = [];
+  cids.forEach((cid) => {
+    modes.forEach((mode) => {
+      paths.push({
+        params: { cid: String(cid), mode }
+      });
+    });
+  });
+
+  return {
+    paths,
+    fallback: true
+  };
+}
 
 export async function getStaticProps({ params }) {
   const prisma = new PrismaClient();
@@ -10,19 +41,57 @@ export async function getStaticProps({ params }) {
     sc: 2,
     nolapskips: 3
   };
-  const cid = 0;
-  const modeName = 'test';
 
-  const modeId = modeNameToModeId[modeName];
+  const modeId = modeNameToModeId[params.mode];
   const mkscvids = await prisma.mkscvids.findMany({
-    where: { cid: Number(cid), mode: modeId },
+    where: { cid: Number(params.cid), mode: modeId },
     // select: { cid: true, link: true, time: true },
     orderBy: { time: 'asc' }
   });
+  const ytNameItems = await prisma.mkscytnames.findMany();
+  const channelIdToPlayerNameMap = Object.fromEntries(
+    ytNameItems.map((item) => [item.id, item.name])
+  );
+
+  const ytLinksInChunksOf50 = chunkArray(
+    mkscvids.map((vid) => vid.link),
+    50
+  );
+  for (let item of ytLinksInChunksOf50) {
+    const concattedLinks = item.join(',');
+
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?id=${concattedLinks}&key=AIzaSyATN_FTkF9ehCDRJa4IaketQD3jMDlNTw8&part=snippet&fields=items(snippet,id)`
+    );
+    const json = await res.json();
+    console.log('json', json);
+
+    json.items.forEach((item) => {
+      const videoId = item.id;
+      const snippet = item.snippet;
+      if (!snippet) return;
+
+      const channelId = snippet.channelId;
+      const date = snippet.publishedAt;
+
+      const playerName = channelIdToPlayerNameMap[channelId];
+
+      const matchingVid = mkscvids.find((vid) => vid.link === videoId);
+      if (matchingVid) {
+        const dateobj = new Date(date);
+        matchingVid.date = dateobj.toLocaleDateString('en-US');
+
+        if (playerName) {
+          matchingVid.player = playerName;
+        }
+      }
+    });
+  }
 
   return {
     props: {
-      mkscvids
+      mkscvids,
+      params
     }
   };
 }
@@ -75,6 +144,12 @@ export default function Videos(props) {
                   scope="col"
                   className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
                 >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
+                >
                   URL
                 </th>
                 <th scope="col" className="relative px-6 py-3">
@@ -83,17 +158,23 @@ export default function Videos(props) {
               </tr>
             </thead>
             <tbody>
-              {mkscvids.map((mkscvid) => {
+              {mkscvids?.map((mkscvid) => {
+                function formatTime(time) {
+                  return time.toFixed(2);
+                }
                 return (
                   <tr
-                    key={mkscvid.cid}
+                    key={mkscvid.link}
                     className="bg-white border-b dark:border-gray-700 dark:bg-gray-800"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {mkscvid.time}
+                      {mkscvid.time.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       {mkscvid.player}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
+                      {mkscvid.date}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       <a href={mkscvid.link}>URL</a>
