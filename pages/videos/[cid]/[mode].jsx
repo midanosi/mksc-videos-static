@@ -57,16 +57,16 @@ export async function getStaticProps({ params }) {
     mkscvids.map((vid) => vid.link),
     50
   );
-  for (let item of ytLinksInChunksOf50) {
-    const concattedLinks = item.join(',');
+  for (let chunk of ytLinksInChunksOf50) {
+    const arrayOfLinks = chunk.map((link) => link.slice(0, 11)); // always exactly 11 chars, remove \t=12s etc.
+    const concattedLinks = arrayOfLinks.join(',');
 
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?id=${concattedLinks}&key=AIzaSyATN_FTkF9ehCDRJa4IaketQD3jMDlNTw8&part=snippet&fields=items(snippet,id)`
     );
     const json = await res.json();
-    console.log('json', json);
 
-    json.items.forEach((item) => {
+    json.items?.forEach((item) => {
       const videoId = item.id;
       const snippet = item.snippet;
       if (!snippet) return;
@@ -114,16 +114,17 @@ export default function Videos(props) {
 
   return (
     <div className="flex flex-col h-full min-h-screen">
-      <header className="flex items-center justify-between p-4 text-white bg-slate-800">
-        <h1 className="text-3xl font-bold">
+      <header className="flex items-center justify-between p-4 bg-slate-800">
+        <h3 className="font-bold">
           <a href="/"> Home</a>
-        </h1>
+        </h3>
       </header>
 
-      <h2>{getCourseName(cid)}</h2>
-      <h3>{mode}</h3>
-
-      <main className="flex h-full bg-white">
+      <main className="h-full bg-white ml-20">
+        <div className="p-4">
+          <h1 className="text-3xl">{getCourseName(cid)}</h1>
+          <h2 className="text-xl">{mode}</h2>
+        </div>
         <div className="h-full border-r shadow-md w-80 bg-gray-50 sm:rounded-lg">
           <table className="min-w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
@@ -176,7 +177,7 @@ export default function Videos(props) {
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       {mkscvid.date}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
+                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white underline">
                       <a href={mkscvid.link}>URL</a>
                     </td>
                   </tr>
