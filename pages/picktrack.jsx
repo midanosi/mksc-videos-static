@@ -18,7 +18,7 @@ export default function PickTrack() {
               <Link
                 key={cid}
                 href={{
-                  pathname: `/videos/${cid}/${mode}`,
+                  pathname: `/videos/${cid}/${mode}.html`,
                   query: { cid, mode }
                 }}
               >
