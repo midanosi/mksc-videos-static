@@ -210,7 +210,6 @@ export default function Videos(props) {
             <tbody>
               {mkscvids?.map((mkscvid) => {
                 function formatTime(time) {
-                  console.log('time %1', time % 1);
                   const decimals = (time % 1)
                     .toFixed(2)
                     .toString()
