@@ -21,13 +21,14 @@ export default function PickTrack() {
                   pathname: `/videos/${cid}/${mode}`
                 }}
               >
-                <a className="relative w-36 h-20 overflow-hidden">
+                <a className="relative w-36 h-24 overflow-hidden">
                   <h3 className="bg-gray-800 text-white whitespace-nowrap text-center w-full absolute transform -translate-x-1/2 -translate-y-1/2 bg-black-700 top-6 left-1/2 bg-opacity-50">
                     {course}
                   </h3>
                   <img
                     src={`/crs${idx + 1}.png`}
                     alt={`thumbnail for ${course}`}
+                    className="h-full w-full"
                   />
                 </a>
               </Link>
