@@ -178,7 +178,7 @@ export default function Videos(props) {
                       {mkscvid.date}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white underline">
-                      <a href={mkscvid.link}>URL</a>
+                      <a href={`https://youtu.be/${mkscvid.link}`}>URL</a>
                     </td>
                   </tr>
                 );
