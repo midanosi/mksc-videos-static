@@ -110,10 +110,8 @@ export default function Videos(props) {
   const mkscvids = props.mkscvids;
   const mode = props.params.mode;
   const cid = Number(props.params.cid);
-  const modeColor = getModeColor(mode);
 
   const courseLapType = cid % 2 === 0 ? 'Course' : 'Flap';
-  const otherType = courseLapType === 'Course' ? 'Flap' : 'Course';
   const otherTypeCid = courseLapType === 'Course' ? cid + 1 : cid - 1;
 
   return (
@@ -135,8 +133,6 @@ export default function Videos(props) {
             </h1>
             <div className="flex items-end gap-2 mb-2">
               {['Course', 'Flap'].map((type) => {
-                const otherTypeCid =
-                  courseLapType === 'Course' ? cid + 1 : cid - 1;
                 return (
                   <a
                     className="hover:underline"
@@ -173,7 +169,7 @@ export default function Videos(props) {
             </div>
           </div>
           <img
-            src={`/crs${subtractOneIfOdd(cid) / 2}.png`}
+            src={`/crs${subtractOneIfOdd(cid) / 2 + 1}.png`}
             alt={`thumbnail for ${getCourseName(cid)}`}
             className="w-40 h-30 overflow-hidden"
           />
