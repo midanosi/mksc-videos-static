@@ -210,15 +210,34 @@ export default function Videos(props) {
             <tbody>
               {mkscvids?.map((mkscvid) => {
                 function formatTime(time) {
-                  return time.toFixed(2);
+                  console.log('time %1', time % 1);
+                  const decimals = (time % 1)
+                    .toFixed(2)
+                    .toString()
+                    .replace('0.', '');
+
+                  const minute = Math.floor(time / 60);
+                  const seconds = Math.floor(time % 60)
+                    .toString()
+                    .padStart(2, '0');
+
+                  if (time >= 60) {
+                    return minute + "'" + seconds + '"' + decimals;
+                  } else if (time >= 10 && time < 60) {
+                    return seconds + '"' + decimals;
+                  }
+                  return seconds + '"' + decimals;
                 }
                 return (
                   <tr
                     key={mkscvid.link}
                     className="bg-white border-b dark:border-gray-700 dark:bg-gray-800"
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {mkscvid.time.toFixed(2)}
+                    <td
+                      style={{ fontVariantNumeric: 'tabular-nums' }}
+                      className="text-right px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {formatTime(mkscvid.time)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       {mkscvid.player}
