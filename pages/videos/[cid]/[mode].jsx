@@ -1,6 +1,6 @@
-import { useRouter } from 'next/router';
 import { PrismaClient } from '@prisma/client';
 import { courses } from '../../../courses';
+import { getModeColor } from '../../../utils';
 
 function chunkArray(a, chunk) {
   if (a.length <= chunk) return [a];
@@ -102,15 +102,19 @@ const subtractOneIfOdd = (i) => {
   return i - 1;
 };
 const getCourseName = (cid) => {
-  const arrayIndex = subtractOneIfOdd(cid);
+  const arrayIndex = subtractOneIfOdd(cid) / 2;
   return courses[arrayIndex];
 };
 
 export default function Videos(props) {
-  const router = useRouter();
-  const mode = router.query.mode;
-  const cid = router.query.cid;
   const mkscvids = props.mkscvids;
+  const mode = props.params.mode;
+  const cid = Number(props.params.cid);
+  const modeColor = getModeColor(mode);
+
+  const courseLapType = cid % 2 === 0 ? 'Course' : 'Flap';
+  const otherType = courseLapType === 'Course' ? 'Flap' : 'Course';
+  const otherTypeCid = courseLapType === 'Course' ? cid + 1 : cid - 1;
 
   return (
     <div className="flex flex-col h-full min-h-screen">
@@ -121,9 +125,58 @@ export default function Videos(props) {
       </header>
 
       <main className="h-full bg-white ml-20">
-        <div className="p-4">
-          <h1 className="text-3xl">{getCourseName(cid)}</h1>
-          <h2 className="text-xl">{mode}</h2>
+        <div
+          className="flex justify-between items-center"
+          style={{ width: '26rem' }}
+        >
+          <div className="p-4">
+            <h1 className="text-3xl whitespace-nowrap mb-2 font-bold">
+              {getCourseName(cid)}
+            </h1>
+            <div className="flex items-end gap-2 mb-2">
+              {['Course', 'Flap'].map((type) => {
+                const otherTypeCid =
+                  courseLapType === 'Course' ? cid + 1 : cid - 1;
+                return (
+                  <a
+                    className="hover:underline"
+                    style={{
+                      color: getModeColor(type),
+                      fontWeight: courseLapType === type ? '500' : 'normal',
+                      opacity: courseLapType === type ? 1 : 0.5,
+                      fontSize: courseLapType === type ? '1.4rem' : '1rem',
+                      lineHeight: courseLapType === type ? '1' : '1.2'
+                    }}
+                    href={`/videos/${otherTypeCid}/${mode}`}
+                  >
+                    {type}
+                  </a>
+                );
+              })}
+            </div>
+            <div className="flex items-end gap-4">
+              {['nonzzmt', 'zzmt', 'sc', 'nolapskips'].map((modeOption) => (
+                <a
+                  className="text-xl hover:underline"
+                  style={{
+                    color: getModeColor(modeOption),
+                    fontWeight: mode === modeOption ? 'bold' : 'normal',
+                    opacity: mode === modeOption ? 1 : 0.5,
+                    fontSize: mode === modeOption ? '1.4rem' : '1rem',
+                    lineHeight: mode === modeOption ? '1' : '1.2'
+                  }}
+                  href={`/videos/${otherTypeCid}/${modeOption}`}
+                >
+                  {modeOption}
+                </a>
+              ))}
+            </div>
+          </div>
+          <img
+            src={`/crs${subtractOneIfOdd(cid) / 2}.png`}
+            alt={`thumbnail for ${getCourseName(cid)}`}
+            className="w-40 h-30 overflow-hidden"
+          />
         </div>
         <div className="h-full border-r shadow-md w-80 bg-gray-50 sm:rounded-lg">
           <table className="min-w-full">
