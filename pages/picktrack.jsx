@@ -18,7 +18,8 @@ export default function PickTrack() {
               <Link
                 key={cid}
                 href={{
-                  pathname: `/videos/${cid}/${mode}`
+                  pathname: `/videos/${cid}/${mode}`,
+                  query: { cid, mode }
                 }}
               >
                 <a className="relative w-36 h-24 overflow-hidden">
