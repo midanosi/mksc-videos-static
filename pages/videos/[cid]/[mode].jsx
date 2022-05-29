@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { courses } from '../../../courses';
 import { getModeColor } from '../../../utils';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 function chunkArray(a, chunk) {
   if (a.length <= chunk) return [a];
@@ -31,6 +33,20 @@ export async function getStaticPaths() {
     paths,
     fallback: false
   };
+}
+async function getStandardsArray({ cid, mode }) {
+  if (mode === 'nolapskips') return [];
+  const publicDirectory = path.join(process.cwd(), 'public');
+  const filename =
+    mode === 'nonzzmt' || mode === 'zzmt'
+      ? 'standardnsc.csv'
+      : 'standardsc.csv';
+  const standardsFile = path.join(publicDirectory, filename);
+
+  const nonscCSV = await fs.readFile(standardsFile, 'utf8');
+  const lines = nonscCSV.split('\n');
+  const standards = lines[cid].split(',').slice(11);
+  return standards;
 }
 
 export async function getStaticProps({ params }) {
@@ -87,6 +103,58 @@ export async function getStaticProps({ params }) {
       }
     });
   }
+
+  const standards = await getStandardsArray({
+    cid: params.cid,
+    mode: params.mode
+  });
+  const standardTitles = [
+    'God',
+    'Myth A',
+    'Myth B',
+    'Myth C',
+    'Myth D',
+    'Myth E',
+    'Titan A',
+    'Titan B',
+    'Titan C',
+    'Titan D',
+    'Titan E',
+    'Hero A',
+    'Hero B',
+    'Hero C',
+    'Hero D',
+    'Hero E',
+    'Exp A',
+    'Exp B',
+    'Exp C',
+    'Exp D',
+    'Exp E',
+    'Adv A',
+    'Adv B',
+    'Adv C',
+    'Adv D',
+    'Adv E',
+    'Int A',
+    'Int B',
+    'Int C',
+    'Int D',
+    'Int E',
+    'Beg A',
+    'Beg B',
+    'Beg C',
+    'Beg D',
+    'Beg E',
+    'Newbie'
+  ];
+  mkscvids.forEach((mkscvid) => {
+    const metStandardIndex = standards.findIndex(
+      (standard) => mkscvid.time < standard
+    );
+    if (metStandardIndex !== -1) {
+      mkscvid.standard = standardTitles[metStandardIndex];
+    }
+  });
 
   return {
     props: {
@@ -161,7 +229,7 @@ export default function Videos(props) {
                     fontSize: mode === modeOption ? '1.4rem' : '1rem',
                     lineHeight: mode === modeOption ? '1' : '1.2'
                   }}
-                  href={`/videos/${otherTypeCid}/${modeOption}`}
+                  href={`/videos/${cid}/${modeOption}`}
                 >
                   {modeOption}
                 </a>
@@ -240,6 +308,9 @@ export default function Videos(props) {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       {mkscvid.player}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
+                      {mkscvid.standard}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-white">
                       {mkscvid.date}
