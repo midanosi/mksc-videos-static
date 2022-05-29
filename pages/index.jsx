@@ -38,7 +38,7 @@ export default () => (
             <Link
               key={mode.id}
               href={{
-                pathname: `/picktrack/${mode.id}`
+                pathname: `/picktrack/${mode.id}.html`
                 // query: { mode: mode.id }
               }}
             >
