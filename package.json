@@ -13,7 +13,7 @@
     "url": "git+https://github.com/leerob/prisma-next-starter.git"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": "16.x"
   },
   "scripts": {
     "dev": "next",
