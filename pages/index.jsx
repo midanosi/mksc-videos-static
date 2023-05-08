@@ -28,7 +28,7 @@ const modes = [
 ];
 
 export default () => (
-  <main className="relative min-h-screen bg-white m-8">
+  <main className="relative min-h-screen m-8 bg-white">
     <h1 className="text-4xl">MKSC Videos</h1>
     <div className="px-4 py-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div className="flex flex-col justify-center gap-8 mt-6">
@@ -38,7 +38,7 @@ export default () => (
             <Link
               key={mode.id}
               href={{
-                pathname: `/picktrack/${mode.id}.html`
+                pathname: `/picktrack/${mode.id}`
                 // query: { mode: mode.id }
               }}
             >
